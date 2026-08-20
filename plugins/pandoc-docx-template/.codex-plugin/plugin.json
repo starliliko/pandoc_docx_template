@@ -1,0 +1,35 @@
+{
+  "name": "pandoc-docx-template",
+  "version": "0.1.0",
+  "description": "Convert Markdown and DOCX with bundled Chinese Word templates and Pandoc filters.",
+  "author": {
+    "name": "starliliko",
+    "url": "https://github.com/starliliko"
+  },
+  "homepage": "https://github.com/starliliko/pandoc_docx_template#readme",
+  "repository": "https://github.com/starliliko/pandoc_docx_template",
+  "keywords": [
+    "pandoc",
+    "markdown",
+    "docx",
+    "word",
+    "chinese-typesetting"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Pandoc DOCX Template",
+    "shortDescription": "Markdown 与 Word 互转及中文模板排版",
+    "longDescription": "Convert Markdown to DOCX or DOCX to Markdown with bundled Chinese Word reference templates, Lua filters, and repeatable Pandoc scripts.",
+    "developerName": "starliliko",
+    "category": "Productivity",
+    "capabilities": [
+      "Write"
+    ],
+    "websiteURL": "https://github.com/starliliko/pandoc_docx_template",
+    "defaultPrompt": [
+      "把 Markdown 转成使用中文模板的 Word 文档。",
+      "把 Word 文档转换成 Markdown 并提取图片。",
+      "列出可用的 Word 模板并帮我选择。"
+    ]
+  }
+}

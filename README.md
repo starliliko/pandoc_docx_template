@@ -1,3 +1,9 @@
+# Pandoc DOCX Template
+
+用于 Markdown 与 Word 互转的中文 Pandoc 模板，同时提供适配当前 Codex 的 skills-only 插件和 GitHub repo marketplace。
+
+插件封装由 `starliliko` 维护；模板与 Lua 过滤器沿用并保留原项目 `Achuan-2/pandoc_docx_template` 的说明与署名。
+
 ## Star History
 
 <a href="https://www.star-history.com/?repos=Achuan-2%2Fpandoc_docx_template&type=date&legend=top-left">
@@ -49,15 +55,18 @@ pandoc 不设置模板导出 docx 的样式
 pandoc通过 `--reference-doc `参数来设置模板路径，可以使用下面命令来设置导出Word(.docx)模板：
 
 ```bash
-pandoc input.md --reference-doc templates/template_标题不编号-列表第二行顶格.docx -o output.docx
+SKILL_ROOT="plugins/pandoc-docx-template/skills/pandoc-docx-template"
+pandoc input.md --reference-doc "$SKILL_ROOT/templates/template_标题不编号-列表第二行顶格.docx" -o output.docx
 ```
 
 为保证Markdown中的HTML标签转换正常，可以使用下面命令：
 
 ```bash
+SKILL_ROOT="plugins/pandoc-docx-template/skills/pandoc-docx-template"
 pandoc README.md -t html | \
     pandoc -f html -o README.docx \
-    --reference-doc templates/template_标题不编号-列表第二行顶格.docx
+    --reference-doc "$SKILL_ROOT/templates/template_标题不编号-列表第二行顶格.docx" \
+    --lua-filter "$SKILL_ROOT/markdown-to-docx.lua"
 ```
 
 ### 在笔记软件使用
@@ -91,30 +100,39 @@ pandoc README.md -t html | \
 
 ### 在 Agent 中使用
 
-本仓库已经提供了可供 Agent 识别的 `SKILL.md`，适合在 Codex,Claude Code 等支持 Skill 的 Agent 中使用。当用户要求“把 Markdown 转成 Word”“套用中文 Word 模板导出 docx”“使用本仓库模板转换文档”时，Agent 会使用本仓库的 `pandoc-docx-template` skill。
+本仓库已按当前 Codex 插件格式组织为 repo marketplace：
 
-
-默认会使用 `templates/template_标题不编号-列表第二行顶格.docx` 作为 Word 参考模板，并加载 `markdown-to-docx.lua` 过滤器，以便处理图片标题、字体颜色、行内代码等 Pandoc 默认转换效果不理想的内容。
-
-Agent 安装Skill方式：
-
-方式一：让AI自己安装
-在 Claude Code、Codex、OpenClaw 等支持 Skill 的 Agent 里，直接说：
+```text
+.agents/plugins/marketplace.json
+plugins/pandoc-docx-template/
+├── .codex-plugin/plugin.json
+└── skills/pandoc-docx-template/
+    ├── SKILL.md
+    ├── scripts/
+    ├── templates/
+    ├── lua/
+    └── markdown-to-docx.lua
 ```
-帮我安装这个 skill：https://github.com/Achuan-2/pandoc_docx_template
+
+开发分支可直接添加为 Codex marketplace：
+
+```powershell
+codex plugin marketplace add starliliko/pandoc_docx_template --ref codex/codex-plugin-marketplace
 ```
 
-方式二：人工手动安装
-- Codex
+重启 Codex 桌面端后，在 Plugins Directory 中选择 `starliliko / Pandoc DOCX Template` 来源，安装 `pandoc-docx-template`，再在新对话中测试。插件默认使用 `template_标题不编号-列表第二行顶格.docx`，并加载 `markdown-to-docx.lua`。
 
-  创建并打开`%USERPROFILE%\.codex\skills\pandoc-docx-template`文件夹，存放本Skill相关文件
+Pandoc 是外部运行依赖；安装插件后仍需确保 `pandoc --version` 能正常执行。
 
-  <img alt="PixPin_2026-05-17_18-14-59" src="https://assets.b3logfile.com/siyuan/1610205759005/assets/PixPin_2026-05-17_18-14-59-20260517181501-phkv6e5.png" />
-- Claude Code
+### 开发与本地验证
 
-  创建并打开`%USERPROFILE%\.claude\skills\pandoc-docx-template`文件夹，存放本Skill相关文件
+仓库提供了不依赖第三方 Python 包、也不使用 GitHub Actions 的结构检查：
 
-  <img alt="PixPin_2026-05-17_18-17-55" src="https://assets.b3logfile.com/siyuan/1610205759005/assets/PixPin_2026-05-17_18-17-55-20260517181800-k2i6z8j.png" />
+```powershell
+python tools/validate_plugin.py
+```
+
+它会检查 marketplace 到插件的路径、插件名称与语义化版本、Skill frontmatter、必要模板/脚本，以及 Python 脚本语法。
 
 
 
@@ -124,24 +142,25 @@ pandoc在处理markdown转docx中存在以下问题
 
 - **问题**：不支持解析markdown中的html标签，比如`<sub>`、`<sup>`、`<img>`等
 
-  - 解决方案1：可以使用lua过滤器来解决这个问题，使用本repo的`lua/markdown-html-recognition.lua`文件
+  - 解决方案1：可以使用lua过滤器来解决这个问题，使用插件 Skill 目录中的`lua/markdown-html-recognition.lua`文件
   - 解决方案2：先转html再转docx
 - **问题**：pandoc默认的图片标题是alt文本，我习惯是用title文本而不是alt文本作为图片标题（这也是思源笔记、语雀等笔记软件的语法解析规则）
 
-  - 解决方案：使用本repo的`lua/image-title-to-caption.lua`文件，，并且这个lua还能把图片都添加Figure样式，就可以用Figure样式整体控制图片是居左还是居右了
+  - 解决方案：使用插件 Skill 目录中的`lua/image-title-to-caption.lua`文件，并且这个lua还能把图片都添加Figure样式，就可以用Figure样式整体控制图片是居左还是居右了
 - **问题**：markdown设置了字体颜色，比如`<span style="color:red">红色文字</span>`，但是导出时颜色丢失
 
-  - 解决方案：使用本repo的`lua/preserve_font_color.lua`文件
+  - 解决方案：使用插件 Skill 目录中的`lua/preserve_font_color.lua`文件
 - **问题**：图片编号无法自定义
 
-  - 解决方案：使用本repo 的`lua/image-title-to-caption-add-number.lua`
+  - 解决方案：使用插件 Skill 目录中的`lua/image-title-to-caption-add-number.lua`
 - **问题**：pandoc代码块和行内代码都是在word里默认都是用一个样式的Source Code，比如我想要代码块只加边框没有底纹，行内代码有底纹就做不到
-  - 解决方案：使用本repo 的`lua/add-inline-code.lua`，为行内代码添加自定义样式`Inline Code`，然后在word模板中修改该样式即可
+  - 解决方案：使用插件 Skill 目录中的`lua/add-inline-code.lua`，为行内代码添加自定义样式`Inline Code`，然后在word模板中修改该样式即可
 
 本repo提供了一个lua过滤器合集markdown-to-docx.lua，可以根据需要选用lua，这样可以让导出的docx文件更符合自己的需求：
 
 ```bash
-pandoc input.md -t html | pandoc -f html -o output.docx --reference-doc templates/template_标题不编号-列表第二行顶格.docx --lua-filter markdown-to-docx.lua
+SKILL_ROOT="plugins/pandoc-docx-template/skills/pandoc-docx-template"
+pandoc input.md -t html | pandoc -f html -o output.docx --reference-doc "$SKILL_ROOT/templates/template_标题不编号-列表第二行顶格.docx" --lua-filter "$SKILL_ROOT/markdown-to-docx.lua"
 ```
 
 我的pandoc使用博客：

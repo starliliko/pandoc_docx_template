@@ -1,3 +1,12 @@
+## 20260820
+
+- 📦 新增符合当前 Codex 规范的 skills-only 插件清单 `.codex-plugin/plugin.json`
+- 🧩 新增 GitHub repo marketplace，可从 Codex 桌面端添加并安装
+- 🗂️ 将 Skill、脚本、模板和 Lua 过滤器整理为自包含插件目录
+- ✅ 新增纯标准库的本地插件结构校验，不依赖 GitHub Actions
+- 📝 更新远程安装说明与 Pandoc 外部依赖边界
+
+
 ## 20260517
 
 - 🎨 新增Skill.md，支持Agent调用

@@ -11,18 +11,22 @@ Use this skill to convert Markdown and DOCX files with Pandoc while applying the
 
 ## Workflow
 
-1. Check that Pandoc is available:
+1. Resolve the directory containing this `SKILL.md`. Treat that directory as the skill root. Run bundled scripts with the skill root as the working directory, or use absolute paths derived from it; do not assume the user's workspace is the skill root.
+
+2. Check that Pandoc is available:
 
 ```bash
 pandoc --version
 ```
 
-2. Choose the conversion direction:
+If Pandoc is unavailable, explain that it is an external runtime dependency. Do not install or modify system packages without the user's approval.
+
+3. Choose the conversion direction:
 
 - Markdown to DOCX: use `scripts/md2docx.py`.
 - DOCX to Markdown: use `scripts/docx2md.py`.
 
-3. Choose a reference DOCX template when exporting Word:
+4. Choose a reference DOCX template when exporting Word:
 
 | Template | Use for |
 | --- | --- |
